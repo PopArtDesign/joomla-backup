@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+if [[ $# -lt 2 ]]; then
+    cat <<EOF
+Usage: ${0##*/} path/to/joomla path/to/backup.zip
+EOF
+    exit 1
+fi
+
+PATH_TO_JOOMLA=$1
+BACKUP_FILE=$(readlink -f $2)
+
+if [[ ! -r $PATH_TO_JOOMLA ]]; then
+    echo "Error: Joomla directory not exists or not readable." 1>&2
+    exit 1
+fi
+
+if [[ ! -r $PATH_TO_JOOMLA/configuration.php ]]; then
+    echo "Error: Joomla configuration file (configuration.php) not exits or not readable." 1>&2
+    exit 1
+fi
+
+if [[ ! -w $(dirname $BACKUP_FILE) ]]; then
+    echo "Error: directory with backup file not exits or not writable." 1>&2
+    exit 1
+fi
+
+db=$(sed -ne "s/^.*\\\$db[=[:space:]]\\+.*'\\(.*\\)'.*\$/\1/p" $PATH_TO_JOOMLA/configuration.php);
+user=$(sed -ne "s/^.*\\\$user[=[:space:]]\\+.*'\\(.*\\)'.*\$/\1/p" $PATH_TO_JOOMLA/configuration.php);
+password=$(sed -ne "s/^.*\\\$password[=[:space:]]\\+.*'\\(.*\\)'.*\$/\1/p" $PATH_TO_JOOMLA/configuration.php);
+
+dump=$(mktemp --suffix '-dump.sql')
+mysqldump $db -u $user -p$password > $dump
+if [[ $? -gt 0 ]]; then
+    rm $dump
+    exit 1
+fi
+
+pushd $PATH_TO_JOOMLA > /dev/null
+zip $BACKUP_FILE tmp/index.html cache/index.html administrator/cache/index.html
+zip -ru $BACKUP_FILE * -x '/cache/*' '/tmp/*' '/administrator/cache/*'
+zip -ju $BACKUP_FILE $dump
+popd > /dev/null
+
+rm $dump
