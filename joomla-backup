@@ -38,7 +38,7 @@ fi
 
 pushd $PATH_TO_JOOMLA > /dev/null
 zip $BACKUP_FILE tmp/index.html cache/index.html administrator/cache/index.html
-zip -ru $BACKUP_FILE * -x '/cache/*' '/tmp/*' '/administrator/cache/*'
+zip -ru $BACKUP_FILE * .* -x '/../*' '/cache/*' '/tmp/*' '/administrator/cache/*'
 zip -ju $BACKUP_FILE $dump
 popd > /dev/null
 
