@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 BACKUP_PATH=$HOME/sites-backups
-BACKUP_COMMAND=./joomla-backup
+BACKUP_COMMAND=$(dirname $(readlink -f $0))/joomla-backup
 
 current_time=$(date +%F_%R:%S)
 backup_dir=$BACKUP_PATH/$current_time
