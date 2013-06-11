@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+BACKUP_PATH=$HOME/sites-backups
+BACKUP_COMMAND=./joomla-backup
+
+current_time=$(date +%F_%R:%S)
+backup_dir=$BACKUP_PATH/$current_time
+
+mkdir $backup_dir
+if [[ $? -gt 0 ]]; then
+    exit 1
+fi
+
+for site in /etc/apache2/sites-available/*; do
+    site_path=$(sed -ne 's/[[:space:]]*DocumentRoot[[:space:]]\+\([^[:space:]]*\)/\1/p' $site) 
+    site_name=$(sed -ne 's/[[:space:]]*ServerName[[:space:]]\+\([^[:space:]]*\)/\1/p' $site) 
+
+    $BACKUP_COMMAND $site_path $backup_dir/$site_name\_$current_time.zip
+done
