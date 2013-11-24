@@ -21,6 +21,7 @@ for site in /etc/apache2/sites-available/*; do
     else
         echo "Backuping: $(tput setaf 2)$site_name$(tput sgr 0) ($site)"
     fi
+    echo "Document root: $site_path"
 
     backup_file=$backup_dir/$site_name\_$current_time.zip
     $BACKUP_COMMAND $site_path $backup_file 1>/dev/null
