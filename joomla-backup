@@ -11,17 +11,17 @@ PATH_TO_JOOMLA=$1
 BACKUP_FILE=$(readlink -f $2)
 
 if [[ ! -r $PATH_TO_JOOMLA ]]; then
-    echo "Error: Joomla directory not exists or not readable." 1>&2
+    echo "$(tput setaf 1)Error: Joomla directory not exists or not readable.$(tput sgr0)" 1>&2
     exit 1
 fi
 
 if [[ ! -r $PATH_TO_JOOMLA/configuration.php ]]; then
-    echo "Error: Joomla configuration file (configuration.php) not exits or not readable." 1>&2
+    echo "$(tput setaf 1)Error: Joomla configuration file (configuration.php) not exits or not readable.$(tput sgr0)" 1>&2
     exit 1
 fi
 
 if [[ ! -w $(dirname $BACKUP_FILE) ]]; then
-    echo "Error: directory with backup file not exits or not writable." 1>&2
+    echo "$(tput setaf 1)Error: directory with backup file not exits or not writable.$(tput sgr0)" 1>&2
     exit 1
 fi
 
