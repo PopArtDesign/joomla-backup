@@ -23,9 +23,9 @@ for site in /etc/apache2/sites-available/*; do
     fi
 
     backup_file=$backup_dir/$site_name\_$current_time.zip
-    $BACKUP_COMMAND $site_path $backup_file 0>/dev/null
+    $BACKUP_COMMAND $site_path $backup_file 1>/dev/null
 
     if [[ $? -eq 0 ]]; then
-        echo "Backup saved to $backup_file"
+        echo "Backup was saved to $backup_file"
     fi
 done
