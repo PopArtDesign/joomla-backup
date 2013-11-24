@@ -28,4 +28,6 @@ for site in /etc/apache2/sites-available/*; do
     if [[ $? -eq 0 ]]; then
         echo "Backup was saved to $backup_file"
     fi
+
+    echo 
 done
