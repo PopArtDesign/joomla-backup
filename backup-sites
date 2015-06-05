@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 BACKUP_PATH=${BACKUP_PATH="$HOME/sites-backups"}
+APACHE_SITES_PATH=${APACHE_SITES_PATH="/etc/apache2/sites-available"}
 
 current_path=$(dirname $(readlink -f $0))
 current_time=$(date +%F_%R:%S)
@@ -8,7 +9,7 @@ backup_dir="$BACKUP_PATH/$current_time"
 
 mkdir $backup_dir || (echo "Can't create directory for backups ($backup_dir)" 1>&2 && exit 1)
 
-for site in /etc/apache2/sites-available/*; do
+for site in "$APACHE_SITES_PATH"/*; do
     site_path=$(sed -ne 's/^[[:space:]]*DocumentRoot[[:space:]]\+\([^[:space:]]*\)/\1/p' $site) 
     site_name=$(sed -ne 's/^[[:space:]]*ServerName[[:space:]]\+\([^[:space:]]*\)/\1/p' $site) 
 
@@ -21,14 +22,16 @@ for site in /etc/apache2/sites-available/*; do
     fi
     echo "Document root: $site_path"
 
-    backup_file=$backup_dir/$site_name\_$current_time.zip
+    backup_file="$backup_dir/${site_name-$site}_${current_time}.zip"
 
     if  [[ -f "$site_path/configuration.php" ]]; then
         "$current_path/joomla-backup" $site_path $backup_file 1>/dev/null && \
             echo "Ok. Backup was saved to $backup_file"
     else
-        zip -ru $backup_file $site_path 1>/dev/null && \
+        pushd "$site_path" > /dev/null
+        zip -r "$backup_file" * .* -x '/../*' 1>/dev/null && \
             echo "Ok. Backup was saved to $backup_file"
+        popd > /dev/null
     fi
 
     echo 
